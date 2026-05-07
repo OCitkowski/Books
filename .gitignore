@@ -1,0 +1,56 @@
+# --- Системні файли ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Логи та тимчасові файли ---
+*.log
+logs/
+*.tmp
+*.temp
+*.txt
+
+# --- Залежності (Dependencies) ---
+node_modules/
+bower_components/
+vendor/
+.pnp
+.pnp.js
+
+# --- Файли середовища та секрети (КРИТИЧНО!) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+
+# --- Налаштування IDE та редакторів ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# --- Папки збірки (Build outputs) ---
+dist/
+build/
+out/
+.next/
+.nuxt/
+bin/
+obj/
+
+# --- Python (якщо є) ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# --- Тести та покриття ---
+coverage/
+.nyc_output/
