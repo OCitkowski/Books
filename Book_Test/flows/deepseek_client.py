@@ -14,29 +14,43 @@ def generate_text(
     prompt: str,
     *,
     model: str,
-    num_ctx: int = 4000,  # not used in DeepSeek, but kept for compatibility
+    num_ctx: int,  # not used in DeepSeek, but kept for compatibility
     num_predict: int,
-    temperature: float = 0.0,
-    repeat_penalty: float = 1.2,  # not used
-    top_p: float = 0.8,
+    temperature: float,
+    repeat_penalty: float,  # not used
+    top_p: float,
     api_key: str = None,
+    system: str = None,
 ) -> str:
     if not api_key:
         api_key = os.getenv("DEEPSEEK_API_KEY")
         if not api_key:
             raise ValueError("DEEPSEEK_API_KEY environment variable not set")
 
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": prompt})
+
     payload = {
         "model": model,
-        "messages": [
-            {"role": "system", "content": "You are a helpful assistant that follows instructions precisely."},
-            {"role": "user", "content": prompt}
-        ],
+        "messages": messages,
         "max_tokens": num_predict,
         "temperature": temperature,
         "top_p": top_p,
         "stream": False,
     }
+    
+    # Debug: save payload
+    import os
+    debug_dir = "/home/leksandro/Projects/Books/Book_Test/data/processed/debug_requests"
+    os.makedirs(debug_dir, exist_ok=True)
+    import time
+    timestamp = int(time.time())
+    debug_file = os.path.join(debug_dir, f"request_{timestamp}.json")
+    with open(debug_file, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    
     data = json.dumps(payload).encode("utf-8")
     req = request.Request(
         DEEPSEEK_URL,

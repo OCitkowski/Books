@@ -296,6 +296,7 @@ def build_bible() -> dict:
         temperature=full_config["temperature"],
         repeat_penalty=full_config["repeat_penalty"],
         top_p=full_config["top_p"],
+        **({"think": full_config.get("think", False)} if full_config.get("type") == "ollama" else {}),
         **({"api_key": full_config.get("api_key")} if full_config.get("type") == "deepseek" else {}),
     )
     try:

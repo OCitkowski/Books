@@ -32,8 +32,8 @@ PROMPTS = {
 # ── Модель ──────────────────────────────────────────────────
 MODEL = {
     "summary": {
-        "type": "deepseek",
-        "name": "deepseek-v4-flash",
+        "type": "ollama",
+        "name": "gemma4:26b",
     },
     "writer": {
         "type": "ollama",
@@ -45,10 +45,12 @@ MODEL = {
         "temperature": 0.25,
         "repeat_penalty": 1.35,
         "top_p": 0.8,
+        "think": False,
     },
+    # ──  "deepseek-v4-flash"
     "deepseek": {
         "num_ctx": 25000,
-        "num_predict": 2000,
+        "num_predict": 4000,
         "temperature": 0.1,
         "repeat_penalty": 1.0,
         "top_p": 0.9,

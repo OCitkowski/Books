@@ -136,6 +136,20 @@ def analyze_chunks(chunks: list[str]) -> list[dict]:
             logger.warning(f"Не вдалося завантажити summaries: {e}")
 
     prompt_template = _load_prompt("summary")
+    
+    # Split prompt into system and user parts
+    if "Excerpt to analyze:" in prompt_template:
+        system_prompt = prompt_template.split("Excerpt to analyze:")[0].strip()
+        user_template = "Excerpt to analyze: {chunk}"
+    else:
+        system_prompt = None
+        user_template = prompt_template
+
+    # For DeepSeek, add thinking instructions
+    if MODEL["summary"]["type"] == "deepseek":
+        thinking_instructions = "\n\nYou are a reasoning AI model. Think step by step before providing the final answer. Use structured reasoning and <think> tags if needed for complex analysis."
+        system_prompt = (system_prompt + thinking_instructions) if system_prompt else thinking_instructions
+    
     start_index = len(summaries)
     total = len(chunks)
 
@@ -149,25 +163,25 @@ def analyze_chunks(chunks: list[str]) -> list[dict]:
         num = i + 1
         logger.info(f"[{num}/{total}] Аналізую чанк ({len(chunk)} символів)...")
 
-        # Виправлено: використовуємо replace замість format, 
-        # щоб уникнути KeyError через фігурні дужки у JSON-промті
-        prompt = prompt_template.replace("{chunk}", chunk)
+        user_prompt = user_template.replace("{chunk}", chunk)
         summary = None
 
         for attempt in range(1, 4):
             try:
                 t0 = time.time()
-                active_prompt = prompt if attempt == 1 else _retry_prompt(prompt)
+                active_user = user_prompt if attempt == 1 else _retry_prompt(user_prompt)
                 full_config = get_full_model_config("summary")
                 generate_func = get_generate_func(full_config)
                 response = generate_func(
-                    active_prompt,
+                    active_user,
                     model=full_config["name"],
                     num_ctx=full_config["num_ctx"],
                     num_predict=full_config["num_predict"],
                     temperature=full_config["temperature"],
                     repeat_penalty=full_config["repeat_penalty"],
                     top_p=full_config["top_p"],
+                    system=system_prompt,
+                    **({"think": full_config.get("think", False)} if full_config.get("type") == "ollama" else {}),
                     **({"api_key": full_config.get("api_key")} if full_config.get("type") == "deepseek" else {}),
                 )
                 _save_summary_response(num, attempt, response)

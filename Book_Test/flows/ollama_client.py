@@ -19,15 +19,17 @@ def generate_text(
     model: str,
     num_ctx: int,
     num_predict: int,
-    temperature: float = 0.0,
-    repeat_penalty: float = 1.2,
-    top_p: float = 0.8,
+    temperature: float,
+    repeat_penalty: float,
+    top_p: float,
+    system: str = None,
+    think: bool = False,
 ) -> str:
     payload = {
         "model": model,
         "prompt": prompt,
         "stream": False,
-        "think": False,
+        "think": think,
         "options": {
             "num_ctx": num_ctx,
             "num_predict": num_predict,
@@ -36,6 +38,8 @@ def generate_text(
             "top_p": top_p,
         },
     }
+    if system:
+        payload["system"] = system
     data = json.dumps(payload).encode("utf-8")
     req = request.Request(
         OLLAMA_URL,
