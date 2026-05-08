@@ -2,11 +2,15 @@
 config.py — всі налаштування пайплайну
 """
 
+import os
+from dotenv import load_dotenv
 from pathlib import Path
 
+load_dotenv()
+
 # ── Коренева папка книги ─────────────────────────────────────
-# main.py запускається з папки Book_<назва>/
-BOOK_DIR = Path(".")
+# Працює незалежно від поточної директорії запуску.
+BOOK_DIR = Path(__file__).resolve().parent
 
 # ── Шляхи ───────────────────────────────────────────────────
 PATHS = {
@@ -27,16 +31,33 @@ PROMPTS = {
 
 # ── Модель ──────────────────────────────────────────────────
 MODEL = {
-    "name":                "gemma4:26b",
-    "num_ctx":             20000,
-    "num_predict":         5000,           # <--- Дозволяємо довгі відповіді
-    "temperature_summary":  0.1,
-    "temperature_bible":    0.2,
-    "temperature_skeleton": 0.1,
+    "summary": {
+        "type": "deepseek",
+        "name": "deepseek-v4-flash",
+    },
+    "writer": {
+        "type": "ollama",
+        "name": "gemma4:26b",
+    },
+    "ollama": {
+        "num_ctx": 40000,
+        "num_predict": 20000,
+        "temperature": 0.25,
+        "repeat_penalty": 1.35,
+        "top_p": 0.8,
+    },
+    "deepseek": {
+        "num_ctx": 25000,
+        "num_predict": 2000,
+        "temperature": 0.1,
+        "repeat_penalty": 1.0,
+        "top_p": 0.9,
+        "api_key": os.getenv("DEEPSEEK_API_KEY"),
+    },
 }
 
 # ── Chunking ─────────────────────────────────────────────────
 CHUNKING = {
-    "chunk_size": 30000,   # символів (~6-10 чанків на 700k)
-    "overlap":     1500,   # ~7.5% overlap
+    "chunk_size": 5000,
+    "overlap":      300,
 }
