@@ -33,7 +33,7 @@ PROMPTS = {
 MODEL = {
     "summary": {
         "type": "ollama",
-        "name": "gemma4:26b",
+        "name": "qwen3.5:9b",
     },
     "writer": {
         "type": "ollama",
